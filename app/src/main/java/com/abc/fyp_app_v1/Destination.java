@@ -17,7 +17,7 @@ public class Destination extends AppCompatActivity {
 
     //The list of room in the area
     // ! improve: My call server to receive this message
-    String[] roomArray = {"Room1","Room2","Room3","Room4","Room5","Room6","Room7","Room8","Room9"};
+    String[] roomArray = {"r1","r2","r3","r4","r5","r6"};
 
     //view variable
     ListView roomlist;
@@ -51,10 +51,12 @@ public class Destination extends AppCompatActivity {
                 String itemValue = (String)roomlist.getItemAtPosition(i);
 
                 //send message to next activity
-                navigate_message.putExtra("STARTEND",main_message.getStringArrayExtra("NEAR_BEACON") + "," +itemValue);
-                Log.i("NAV_MESSAGE","main_message.getStringArrayExtra(\"NEAR_BEACON\") + \",\" +itemValue");
-                //start next activity
-                startActivity(navigate_message);
+                if(main_message.getExtras().getString("NEAR_BEACON")!=null){
+                    navigate_message.putExtra("STARTEND","r1" + "," +itemValue);
+                    Log.i("NAV_MESSAGE","r1" + "," +itemValue);
+                    //start next activity
+                    startActivity(navigate_message);
+                }
             }
         });
 

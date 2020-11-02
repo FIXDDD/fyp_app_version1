@@ -57,14 +57,14 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         proximityManager.stopScanning();
                         if(min != null) {
+                            String nearbeacon = min.getKey();
                             Log.i("finalmin", "Hash map ~ " + min.getKey() + " : " + min.getValue() + " ");
 
                             //start destination activity and pass min to next activity
                             Intent intent = new Intent(MainActivity.this,Destination.class);
-                            intent.putExtra("NEAR_BEACON",min.getKey());
+                            intent.putExtra("NEAR_BEACON",nearbeacon);
                             startActivity(intent);
                         }
-                        else{}
                     }
                 }, 3000);
             }
