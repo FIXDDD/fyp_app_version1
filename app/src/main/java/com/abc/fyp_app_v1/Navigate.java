@@ -3,6 +3,7 @@ package com.abc.fyp_app_v1;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -36,14 +37,30 @@ public class Navigate extends AppCompatActivity {
         simpleWebView.setWebViewClient(new WebViewClient());
         simpleWebView.setWebChromeClient(new WebChromeClient());
         // specify the url of the web page in loadUrl function
-        simpleWebView.loadUrl("http://192.168.1.22/fyp_test_web/");
+        simpleWebView.loadUrl("http://172.28.53.66/fyp_test/");
 
+        /*
+        simpleWebView.setWebChromeClient(new WebChromeClient(){
+            public void onProgressChanged( WebView view, int newProgress) {
+                if(newProgress==100){
+                    String script="Javascript:navigate('"+startend[0]+"','"+startend[1]+"')";
+                    Log.i("SCRIPT",script);
+                    simpleWebView.loadUrl(script);
+                }
+            }
+        });
+        */
         simpleWebView.setWebViewClient(new WebViewClient(){
             public void onPageFinished(WebView view, String url){
                 //String script="Javascript:Android.receive(navigate('"+startend[0]+"','"+startend[1]+"'))";
                 String script="Javascript:navigate('"+startend[0]+"','"+startend[1]+"')";
                 Log.i("SCRIPT",script);
-                simpleWebView.loadUrl(script);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    simpleWebView.evaluateJavascript("navigate('"+startend[0]+"','"+startend[1]+"')",null);
+                }
+                else{
+                    simpleWebView.loadUrl(script);
+                }
             }
         });
     }
