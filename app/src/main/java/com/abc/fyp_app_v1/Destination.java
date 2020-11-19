@@ -7,17 +7,33 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.kontakt.sdk.android.common.util.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 public class Destination extends AppCompatActivity {
 
+    // call dataHolder class
+    DataHolder data = new DataHolder();
+
     //The list of room in the area
-    // ! improve: My call server to receive this message
-    String[] roomArray = {"r1","r2","r3","r4","r5","r6"};
+    //String[] roomArray = {"r1","r2","r3","r4","r5","r6"};
+    String[] roomArray = data.getroomArray();
+    List<String> list = new ArrayList<String>(Arrays.asList(roomArray));
+
+    // static HashMap to store which beacon is which area
+    public HashMap<String, String[]> beacon_place= data.getbeacon_place();
+
 
     //view variable
     ListView roomlist;
@@ -32,13 +48,18 @@ public class Destination extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_destination);
 
-        //set listview content
-        ArrayAdapter adapter = new ArrayAdapter<String>(this,
-                R.layout.destination_listview, roomArray);
-
         //set intent
         navigate_message = new Intent(Destination.this,Navigate.class);
         main_message = getIntent();
+
+        String x = beacon_place.get(main_message.getExtras().getString("NEAR_BEACON"))[0];
+        Log.i("xvalue",x);
+        list.remove(x);
+
+        //set listview content
+        ArrayAdapter adapter = new ArrayAdapter<String>(this,
+                R.layout.destination_listview, list);
+
 
         //get view objects
         roomlist = (ListView) findViewById(R.id.room_list);
@@ -59,9 +80,6 @@ public class Destination extends AppCompatActivity {
                 }
             }
         });
-
-
-
 
         ListView listView = (ListView) findViewById(R.id.room_list);
         listView.setAdapter(adapter);
