@@ -27,13 +27,21 @@ import java.util.Map;
 public class Navigate extends AppCompatActivity {
 
     // call dataHolder class
-    static DataHolder dataa = new DataHolder();
+    DataHolder dataa = new DataHolder();
+
+    //save gen road
+    String[][] road;
+
+    myjsinterface javascriptinterface = new myjsinterface();
 
     // beacoon scan manager
     private ProximityManager proximityManager;
 
-    // message pass between activity
+    // message pass between Destionation and navigaton activity
     Intent pass_message;
+    // message pass to instruction activity
+    Intent instruction;
+
     // to seperate the start and end message from prievious activity
     String[] startend;
 
@@ -44,18 +52,13 @@ public class Navigate extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigate);
 
-
-        KontaktSDK.initialize("DkDxdmEmVCGZDobylzFHLzNiudPrNfOX");
-        proximityManager = ProximityManagerFactory.create(this);
-        proximityManager.setSecureProfileListener(createSecureProfileListener());
-
         pass_message = getIntent();
         startend = pass_message.getExtras().getString("STARTEND").split(",");
 
         // IF there is connection
         //  find Web view on main activity
         final WebView simpleWebView = (WebView) findViewById(R.id.simpleWebView);
-        simpleWebView.addJavascriptInterface(new JavaScriptInterface(this),"Android");
+        simpleWebView.addJavascriptInterface(javascriptinterface,"Android");
         WebSettings webSettings = simpleWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -90,6 +93,8 @@ public class Navigate extends AppCompatActivity {
         });
         */
 
+
+
         simpleWebView.setWebViewClient(new WebViewClient(){
             public void onPageFinished(WebView view, String url){
                 //String script="Javascript:Android.receive(navigate('"+startend[0]+"','"+startend[1]+"'))";
@@ -105,41 +110,19 @@ public class Navigate extends AppCompatActivity {
             }
         });
 
+
+
     }
 
-
-    // for scan ebeacon
-    private SecureProfileListener createSecureProfileListener() {
-        return new SecureProfileListener() {
-            @Override
-            public void onProfileDiscovered(ISecureProfile profile) {
-
-            }
-
-            @Override
-            public void onProfilesUpdated(List<ISecureProfile> profiles) {
-            }
-
-            @Override
-            public void onProfileLost(ISecureProfile profile) {
-
-            }
-        };
-    }
-
-    // Txpower is the signal power one meter away i  dbm and rssi is the signal receive now
-    private double calculateAccuracy(int txPower, double rssi) {
-        if (rssi == 0) {
-            return -1.0; // if we cannot determine accuracy, return -1.
-        }
-
-        double ratio = rssi*1.0/txPower;
-        if (ratio < 1.0) {
-            return Math.pow(ratio,10);
-        }
-        else {
-            double accuracy =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;
-            return accuracy;
+    class myjsinterface {
+        @JavascriptInterface
+        public void transmit(String d) {
+            Log.i("restest", d);
+            instruction = new Intent(Navigate.this,InstructionActivity.class);
+            instruction.putExtra("instruc",d);
+            startActivity(instruction);
         }
     }
+
+
 }

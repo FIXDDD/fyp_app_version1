@@ -1,23 +1,28 @@
 package com.abc.fyp_app_v1;
 
-import android.content.Context;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
-import android.webkit.JavascriptInterface;
-import android.widget.Toast;
 
 import java.util.Arrays;
 
-public class JavaScriptInterface {
-    Context mContext;
+public class InstructionActivity extends AppCompatActivity {
 
-    JavaScriptInterface(Context c){
-        mContext = c;
-    }
+    Intent getinstruc;
+    String waystep;
+    String[][] waysteparray;
 
-    @JavascriptInterface
-    public String[][] transmit(String d){
-        Log.i("restest", d );
-        return convertdata(d);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_instruction);
+
+        getinstruc = getIntent();
+        waystep = getinstruc.getExtras().getString("instruc");
+        Log.i("zvalue",waystep);
+        waysteparray = convertdata(waystep);
     }
 
     // for converting web recieve string to array format
@@ -38,5 +43,4 @@ public class JavaScriptInterface {
         Log.i("formatdata", Arrays.deepToString(formatedata));
         return formatedata;
     }
-
 }
