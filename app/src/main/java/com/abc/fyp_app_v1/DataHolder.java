@@ -12,7 +12,9 @@ public class DataHolder {
         //put value to rooms Hashmap
         this.beacon_place.put("OufQT4", new String[]{"r1", "3"});
         this.beacon_place.put("OugKl0", new String[]{"c1", "3"});
-        this.beacon_place.put("OuJ2KF", new String[]{"r2", "3"});
+        this.beacon_place.put("OuJ2kF", new String[]{"r2", "3"});
+        this.beacon_place.put("OuQ0Lp", new String[]{"r3", "3"});
+
     }
     public HashMap<String, String[]> getbeacon_place() {
         return beacon_place;

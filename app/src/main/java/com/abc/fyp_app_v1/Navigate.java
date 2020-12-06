@@ -7,45 +7,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.kontakt.sdk.android.ble.manager.ProximityManager;
-import com.kontakt.sdk.android.ble.manager.ProximityManagerFactory;
-import com.kontakt.sdk.android.ble.manager.listeners.SecureProfileListener;
-import com.kontakt.sdk.android.common.KontaktSDK;
-import com.kontakt.sdk.android.common.profile.ISecureProfile;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Navigate extends AppCompatActivity {
 
-    // call dataHolder class
-    DataHolder dataa = new DataHolder();
-
-    //save gen road
-    String[][] road;
-
     myjsinterface javascriptinterface = new myjsinterface();
-
-    // beacoon scan manager
-    private ProximityManager proximityManager;
 
     // message pass between Destionation and navigaton activity
     Intent pass_message;
     // message pass to instruction activity
     Intent instruction;
-
     // to seperate the start and end message from prievious activity
     String[] startend;
-
-    HashMap<String, String[]> b_place = dataa.getbeacon_place();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
