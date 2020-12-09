@@ -52,7 +52,7 @@ public class Destination extends AppCompatActivity {
         navigate_message = new Intent(Destination.this,Navigate.class);
         main_message = getIntent();
 
-        String x = beacon_place.get(main_message.getExtras().getString("NEAR_BEACON"))[0];
+        final String x = beacon_place.get(main_message.getExtras().getString("NEAR_BEACON"))[0];
         Log.i("xvalue",x);
         list.remove(x);
 
@@ -73,8 +73,8 @@ public class Destination extends AppCompatActivity {
 
                 //send message to next activity
                 if(main_message.getExtras().getString("NEAR_BEACON")!=null){
-                    navigate_message.putExtra("STARTEND","r1" + "," +itemValue);
-                    Log.i("NAV_MESSAGE","r1" + "," +itemValue);
+                    navigate_message.putExtra("STARTEND",x + "," +itemValue);
+                    Log.i("NAV_MESSAGE",x + "," +itemValue);
                     //start next activity
                     startActivity(navigate_message);
                 }
