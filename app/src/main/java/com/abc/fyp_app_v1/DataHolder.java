@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class DataHolder {
     private HashMap<String, String[]> beacon_place= new HashMap<String, String[]>();
-    private String[] roomArray = {"r1","r2"};
+    private String[] roomArray = {"r1","r2","r3","r4","r5","r6"};
     private String[][] road;
 
     public DataHolder()
