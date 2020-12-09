@@ -11,6 +11,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +56,8 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     TextView faceing;
     // action of user
     TextView Act;
+    // end button
+    Button endbtn;
 
     //step counter
     int step = 0;
@@ -89,6 +93,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
         faceing = (TextView) findViewById(R.id.compass);
         pointer = (TextView) findViewById(R.id.point);
         Act = (TextView) findViewById(R.id.action);
+        endbtn = (Button)findViewById(R.id.donebtn);
 
         // init user location
         getinstruc = getIntent();
@@ -178,6 +183,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                             getinstruc = getIntent();
                             waystep = getinstruc.getExtras().getString("instruc");
                             waysteparray = convertdata(waystep);
+                            endbtn = (Button)findViewById(R.id.donebtn);
 
                             String[] now = waysteparray[step];
                             //variable to calculate faceing
@@ -232,6 +238,13 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     direction.setText(waysteparray[step][1]);
                                     pointer.setText("Done");
                                     Act.setText("Done");
+                                    endbtn.setVisibility(View.VISIBLE);
+                                    endbtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            startActivity(new Intent(InstructionActivity.this,MainActivity.class));
+                                        }
+                                    });
                                 }
                             }
                         }
