@@ -235,7 +235,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     Act.setText("Walk");
                                 }
                                 if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1])){
-                                    direction.setText(waysteparray[step][1]);
+                                    direction.setText("Done");
                                     pointer.setText("Done");
                                     Act.setText("Done");
                                     endbtn.setVisibility(View.VISIBLE);
