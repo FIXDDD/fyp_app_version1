@@ -48,6 +48,8 @@ public class Destination extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_destination);
 
+        this.setTitle("Please select your destination bellow");
+
         //set intent
         navigate_message = new Intent(Destination.this,Navigate.class);
         main_message = getIntent();

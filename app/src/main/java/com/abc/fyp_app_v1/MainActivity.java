@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        this.setTitle("Press the button bellow for the application to find your location in the building");
+
         //initialize Kontakt
         KontaktSDK.initialize("DkDxdmEmVCGZDobylzFHLzNiudPrNfOX");
         proximityManager = ProximityManagerFactory.create(this);

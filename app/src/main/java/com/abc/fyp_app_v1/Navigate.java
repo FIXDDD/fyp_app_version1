@@ -29,6 +29,8 @@ public class Navigate extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigate);
 
+        this.setTitle("Loading");
+
         pass_message = getIntent();
         startend = pass_message.getExtras().getString("STARTEND").split(",");
 

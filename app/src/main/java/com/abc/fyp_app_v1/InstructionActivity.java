@@ -9,7 +9,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class InstructionActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -76,15 +79,20 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     private boolean mLastAccelerometerSet = false;
     private boolean mLastMagnetometerSet = false;
 
+    MediaPlayer player;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_instruction);
 
+        this.setTitle("Please follow instruction shown on screen bellow");
+
         //initialize Kontakt
         KontaktSDK.initialize("DkDxdmEmVCGZDobylzFHLzNiudPrNfOX");
         proximityManager = ProximityManagerFactory.create(this);
         proximityManager.setSecureProfileListener(createSecureProfileListener());
+        proximityManager.configuration().deviceUpdateCallbackInterval(TimeUnit.SECONDS.toMillis(2));
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -191,6 +199,16 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                             String pointtext="";
                             if (step<waysteparray.length-1) {
                                 if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step + 1][0])) {
+                                    if(player == null){
+                                        player = MediaPlayer.create(getApplication().getApplicationContext() ,R.raw.log );
+                                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                            @Override
+                                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                                stopPlayer();
+                                            }
+                                        });
+                                    }
+                                    player.start();
                                     Log.i("stepnum", String.valueOf(step));
                                     step = step + 1;
                                     direction.setText(Arrays.toString(waysteparray[step]));
@@ -235,6 +253,15 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     Act.setText("Walk");
                                 }
                                 if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1])){
+                                    proximityManager.stopScanning();
+                                    player = MediaPlayer.create(getApplication().getApplicationContext() ,R.raw.out );
+                                    player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                        @Override
+                                        public void onCompletion(MediaPlayer mediaPlayer) {
+                                            stopPlayer();
+                                        }
+                                    });
+                                    player.start();
                                     direction.setText("Done");
                                     pointer.setText("Done");
                                     Act.setText("Done");
@@ -415,6 +442,13 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
         return tur = dir - mAzimu;
 
+    }
+
+    public void stopPlayer(){
+        if (player !=null){
+            player.release();
+            player = null;
+        }
     }
 
 }
