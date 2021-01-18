@@ -42,7 +42,7 @@ public class SettingActivity extends AppCompatActivity {
     BluetoothConnectionService mBluetoothConnection;
     BluetoothDevice mBTDevice;
     private static final UUID MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
-    String deviceID = "00:1A:7D:DA:71:11";
+    String deviceID = "DC:A6:32:A2:19:BC";
 
 
     //For gps get permission
@@ -99,6 +99,8 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+
+        this.setTitle("Press the button bellow to connect the obstacle avoidance device.");
 
         //get view object
         raspscanbtn = (Button)findViewById(R.id.raspscan_btn);
@@ -280,5 +282,9 @@ public class SettingActivity extends AppCompatActivity {
                 });
         final AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    public BluetoothConnectionService getmBluetoothConnection(){
+        return mBluetoothConnection;
     }
 }

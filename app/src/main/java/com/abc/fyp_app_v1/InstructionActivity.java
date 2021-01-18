@@ -2,9 +2,13 @@ package com.abc.fyp_app_v1;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -32,6 +36,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class InstructionActivity extends AppCompatActivity implements SensorEventListener {
+
 
     //kontakt setup
     private ProximityManager proximityManager;
@@ -81,12 +86,27 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
     MediaPlayer player;
 
+    //Bluetooth part
+// Receivers
+
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("Receive", "onReceive: " + intent.getStringExtra("theMessage"));
+            if (intent.getStringExtra("theMessage").equals("1")){
+                Toast.makeText(InstructionActivity.this, "Obstacle blocking the way within 1 meter!",Toast.LENGTH_SHORT).show();
+            };
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_instruction);
 
         this.setTitle("Please follow instruction shown on screen bellow");
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,new IntentFilter("incomingMessage"));
 
         //initialize Kontakt
         KontaktSDK.initialize("DkDxdmEmVCGZDobylzFHLzNiudPrNfOX");
