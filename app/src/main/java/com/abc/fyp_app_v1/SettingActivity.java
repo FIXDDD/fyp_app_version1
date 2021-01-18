@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -48,6 +49,9 @@ public class SettingActivity extends AppCompatActivity {
     private static final int REQUEST_LOCATION = 1;
     boolean gpson = true;
 
+    // for loading scan beacon
+    ProgressDialog scanProgressDialog;
+
     // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver mBroadcastReceiver1 = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -86,7 +90,6 @@ public class SettingActivity extends AppCompatActivity {
                 if (device.getAddress().equals(deviceID)){
                     mBTDevice = device;
                     Log.d("Found device", "Raspberry pi");
-                    buildAlertMessageConnectDevice();
                 }
             }
         }
@@ -103,7 +106,7 @@ public class SettingActivity extends AppCompatActivity {
         raspscanbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                connectrasp();
+                connectrasp(view);
             }
         });
 
@@ -212,11 +215,26 @@ public class SettingActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void connectrasp(){
+    private void connectrasp(View view){
         mBluetoothAdapter.startDiscovery();
         mBluetoothConnection = new BluetoothConnectionService(SettingActivity.this);
         IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
+        scanProgressDialog = ProgressDialog.show(SettingActivity.this,"Scanning nearby bluetooth device"
+                ,"Please Wait...",true);
+        view.postDelayed(new Runnable() {
+            public void run() {
+                mBluetoothAdapter.cancelDiscovery();
+                scanProgressDialog.dismiss();
+                if (mBTDevice != null){
+                    buildAlertMessageConnectDevice();
+                }else{
+                    buildAlertMessageNoRasp();
+                }
+                }
+            }
+        , 3000);
+
     }
 
     // ALTER MESSAGE for gps
@@ -231,6 +249,27 @@ public class SettingActivity extends AppCompatActivity {
                         mBluetoothConnection.startClient(mBTDevice,MY_UUID_INSECURE);
                         Intent intent = new Intent(SettingActivity.this,MainActivity.class);
                         startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        finish();
+                        System.exit(0);
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    // ALTER MESSAGE for gps
+    protected void buildAlertMessageNoRasp() {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Object Avoidance device not found, please try again")
+                .setCancelable(false)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        return;
                     }
                 })
                 .setNegativeButton("Exit App", new DialogInterface.OnClickListener() {

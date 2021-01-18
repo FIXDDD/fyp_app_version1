@@ -2,6 +2,9 @@ package com.abc.fyp_app_v1;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
     // variable for view object
     Button locationbtn;
 
+    // loading for scan nearby beacon
+    // for loading scan beacon
+    ProgressDialog scanBeaconProgressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,17 +63,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 getlocation();
+                scanBeaconProgressDialog = ProgressDialog.show(MainActivity.this,"Detecting your location"
+                        ,"Please Wait...",true);
                 view.postDelayed(new Runnable() {
                     public void run() {
                         proximityManager.stopScanning();
+                        scanBeaconProgressDialog.dismiss();
                         if(min != null) {
                             String nearbeacon = min.getKey();
                             Log.i("finalmin", "Hash map ~ " + min.getKey() + " : " + min.getValue() + " ");
-
                             //start destination activity and pass min to next activity
                             Intent intent = new Intent(MainActivity.this,Destination.class);
                             intent.putExtra("NEAR_BEACON",nearbeacon);
                             startActivity(intent);
+                        }
+                        else{
+                            buildAlertMessageNoBeacon();
                         }
                     }
                 }, 3000);
@@ -143,6 +155,27 @@ public class MainActivity extends AppCompatActivity {
             double accuracy =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;
             return accuracy;
         }
+    }
+
+    // ALTER MESSAGE for gps
+    protected void buildAlertMessageNoBeacon() {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Error: Cannot detect your location, please try again.")
+                .setCancelable(false)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        return;
+                    }
+                })
+                .setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        finish();
+                        System.exit(0);
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
 }
