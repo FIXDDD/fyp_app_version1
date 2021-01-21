@@ -4,6 +4,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -42,7 +45,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     private ProximityManager proximityManager;
 
     //Dataholder
-    DataHolder dataa = new DataHolder();
+    DataHolder2 dataa = new DataHolder2();
 
     //Map to store detected beacon
     public Map<String,Double> value2 =new HashMap<String,Double>();
@@ -84,7 +87,11 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     private boolean mLastAccelerometerSet = false;
     private boolean mLastMagnetometerSet = false;
 
+    BluetoothAdapter bAdapter;
+
     MediaPlayer player;
+
+    int OADcount=0;
 
     //Bluetooth part
 // Receivers
@@ -93,11 +100,24 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("Receive", "onReceive: " + intent.getStringExtra("theMessage"));
-            if (intent.getStringExtra("theMessage").equals("1")){
-                Toast.makeText(InstructionActivity.this, "Obstacle blocking the way within 1 meter!",Toast.LENGTH_SHORT).show();
+            if (intent.getStringExtra("theMessage").equals("1") && OADcount == 0) {
+                Toast.makeText(InstructionActivity.this, "Obstacle blocking the way within 1 meter!", Toast.LENGTH_SHORT).show();
+                OADcount = OADcount + 1;
             };
+            if (intent.getStringExtra("theMessage").equals("1") && OADcount > 0 && OADcount <5 ) {
+                OADcount = OADcount + 1;
+            };
+            if (intent.getStringExtra("theMessage").equals("1") && OADcount >=5 ) {
+                Toast.makeText(InstructionActivity.this, "Obstacle blocking the way within 1 meter!", Toast.LENGTH_SHORT).show();
+                OADcount = 0;
+            };
+            if(intent.getStringExtra("theMessage").equals("0")){
+                OADcount = 0;
+            }
         }
     };
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +126,9 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
         this.setTitle("Please follow instruction shown on screen bellow");
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,new IntentFilter("incomingMessage"));
+        if(getIntent().getExtras().getBoolean("OAD") == Boolean.TRUE) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
+        }
 
         //initialize Kontakt
         KontaktSDK.initialize("DkDxdmEmVCGZDobylzFHLzNiudPrNfOX");
@@ -289,7 +311,17 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     endbtn.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            startActivity(new Intent(InstructionActivity.this,MainActivity.class));
+                                            proximityManager.stopScanning();
+                                            compassstop();
+                                            LocalBroadcastManager.getInstance(InstructionActivity.this).unregisterReceiver(mReceiver);
+                                            bAdapter = BluetoothAdapter.getDefaultAdapter();
+                                            bAdapter.disable();
+                                            Intent mStartActivity = new Intent(InstructionActivity.this, SettingActivity.class);
+                                            startActivity(mStartActivity);
+                                            Intent i = getBaseContext().getPackageManager()
+                                                    .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(i);
                                         }
                                     });
                                 }

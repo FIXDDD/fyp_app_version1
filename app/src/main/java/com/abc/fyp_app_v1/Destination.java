@@ -24,7 +24,7 @@ import java.util.List;
 public class Destination extends AppCompatActivity {
 
     // call dataHolder class
-    DataHolder data = new DataHolder();
+    DataHolder2 data = new DataHolder2();
 
     //The list of room in the area
     //String[] roomArray = {"r1","r2","r3","r4","r5","r6"};
@@ -77,6 +77,7 @@ public class Destination extends AppCompatActivity {
                 if(main_message.getExtras().getString("NEAR_BEACON")!=null){
                     navigate_message.putExtra("STARTEND",x + "," +itemValue);
                     Log.i("NAV_MESSAGE",x + "," +itemValue);
+                    navigate_message.putExtra("OAD",getIntent().getExtras().getBoolean("OAD"));
                     //start next activity
                     startActivity(navigate_message);
                 }

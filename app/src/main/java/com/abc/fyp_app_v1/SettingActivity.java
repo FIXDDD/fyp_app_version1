@@ -4,10 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -94,6 +97,8 @@ public class SettingActivity extends AppCompatActivity {
             }
         }
     };
+
+    BluetoothServerSocket mmServerSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,7 +240,7 @@ public class SettingActivity extends AppCompatActivity {
                 }
                 }
             }
-        , 3000);
+        , 5000);
 
     }
 
@@ -250,6 +255,7 @@ public class SettingActivity extends AppCompatActivity {
                         Log.i("Connect to raspberry","Connecting to raspberry");
                         mBluetoothConnection.startClient(mBTDevice,MY_UUID_INSECURE);
                         Intent intent = new Intent(SettingActivity.this,MainActivity.class);
+                        intent.putExtra("OAD",Boolean.TRUE);
                         startActivity(intent);
                     }
                 })
@@ -269,15 +275,17 @@ public class SettingActivity extends AppCompatActivity {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Object Avoidance device not found, please try again")
                 .setCancelable(false)
-                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Scan again", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         return;
                     }
                 })
-                .setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Continue without it", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        finish();
-                        System.exit(0);
+                        Intent intent = new Intent(SettingActivity.this,MainActivity.class);
+                        intent.putExtra("OAD",Boolean.FALSE);
+                        startActivity(intent);
+
                     }
                 });
         final AlertDialog alert = builder.create();

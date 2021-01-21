@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         this.setTitle("Press the button bellow for the application to find your location in the building");
 
+
         //initialize Kontakt
         KontaktSDK.initialize("DkDxdmEmVCGZDobylzFHLzNiudPrNfOX");
         proximityManager = ProximityManagerFactory.create(this);
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                             //start destination activity and pass min to next activity
                             Intent intent = new Intent(MainActivity.this,Destination.class);
                             intent.putExtra("NEAR_BEACON",nearbeacon);
+                            intent.putExtra("OAD",getIntent().getExtras().getBoolean("OAD"));
                             startActivity(intent);
                         }
                         else{

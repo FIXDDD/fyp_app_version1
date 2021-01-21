@@ -58,7 +58,7 @@ public class Navigate extends AppCompatActivity {
         simpleWebView.setWebViewClient(new WebViewClient());
         simpleWebView.setWebChromeClient(new WebChromeClient());
         // specify the url of the web page in loadUrl function
-        simpleWebView.loadUrl("file:///android_asset/fyp_test_web/index.html");
+        simpleWebView.loadUrl("file:///android_asset/fyp_test_web2/index.html");
 
         /*
         simpleWebView.setWebChromeClient(new WebChromeClient(){
@@ -99,6 +99,7 @@ public class Navigate extends AppCompatActivity {
             Log.i("restest", d);
             instruction = new Intent(Navigate.this,InstructionActivity.class);
             instruction.putExtra("instruc",d);
+            instruction.putExtra("OAD",getIntent().getExtras().getBoolean("OAD"));
             startActivity(instruction);
         }
     }
