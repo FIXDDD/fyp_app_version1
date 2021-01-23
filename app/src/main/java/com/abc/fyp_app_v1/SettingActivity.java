@@ -98,8 +98,6 @@ public class SettingActivity extends AppCompatActivity {
         }
     };
 
-    BluetoothServerSocket mmServerSocket;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

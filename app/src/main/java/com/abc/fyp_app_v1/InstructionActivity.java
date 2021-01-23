@@ -57,18 +57,10 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     String waystep;
     String[][] waysteparray;
 
-    // get textview
-
-    // the proccess now
-    TextView direction;
-    // the degree turn to point
-    TextView pointer;
-    // the direction facing now
-    TextView faceing;
-    // action of user
-    TextView Act;
     // end button
     Button endbtn;
+    // final text
+    TextView textfinal;
 
     //step counter
     int step = 0;
@@ -138,19 +130,14 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
-        //get UI variable
-        direction = (TextView)findViewById(R.id.Direction);
-        faceing = (TextView) findViewById(R.id.compass);
-        pointer = (TextView) findViewById(R.id.point);
-        Act = (TextView) findViewById(R.id.action);
         endbtn = (Button)findViewById(R.id.donebtn);
+        textfinal = (TextView) findViewById(R.id.final_text);
 
         // init user location
         getinstruc = getIntent();
         waystep = getinstruc.getExtras().getString("instruc");
         Log.i("zvalue",waystep);
         waysteparray = convertdata(waystep);
-        direction.setText(Arrays.toString(waysteparray[step]));
 
         //start find user facing
         compassstart();
@@ -227,19 +214,19 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
 
                             //get text view form UI
-                            direction = (TextView)findViewById(R.id.Direction);
-                            pointer = (TextView) findViewById(R.id.point);
-                            Act = (TextView) findViewById(R.id.action);
                             getinstruc = getIntent();
                             waystep = getinstruc.getExtras().getString("instruc");
                             waysteparray = convertdata(waystep);
                             endbtn = (Button)findViewById(R.id.donebtn);
+                            textfinal = (TextView) findViewById(R.id.final_text);
 
                             String[] now = waysteparray[step];
                             //variable to calculate faceing
                             int dirtocompass = 0;
-                            String pointtext="";
+                            String lasttext="";
+                            String nextDes="";
                             if (step<waysteparray.length-1) {
+                                nextDes = waysteparray[step][1];
                                 if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step + 1][0])) {
                                     if(player == null){
                                         player = MediaPlayer.create(getApplication().getApplicationContext() ,R.raw.log );
@@ -253,7 +240,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     player.start();
                                     Log.i("stepnum", String.valueOf(step));
                                     step = step + 1;
-                                    direction.setText(Arrays.toString(waysteparray[step]));
+                                    nextDes = waysteparray[step][1];
                                 }
 
                                 dirtocompass = turndegree(waysteparray[step][2],mAzimuth);
@@ -261,38 +248,35 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                 if(dirtocompass <-30 || dirtocompass >30) {
                                     if (dirtocompass < 180) {
                                         // Turn left : left degrees
-                                        pointtext= "Turn Right: " + String.valueOf(dirtocompass);
+                                        lasttext = "Turn Right " + String.valueOf(dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
                                     } else {
                                         // Turn right : 360-left degrees
-                                        pointtext="Turn Left: " + String.valueOf( 360 - dirtocompass);
+                                        lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
                                     }
-                                    pointer.setText(pointtext);
-                                    Act.setText("Turn");
+                                    textfinal.setText(lasttext);
                                 }
                                 else{
-                                    pointtext= "This Direction";
-                                    pointer.setText(pointtext);
-                                    Act.setText("Walk");
+                                    lasttext = "Walk straight for 3 meters to reach " + nextDes;
+                                    textfinal.setText(lasttext);
                                 }
                             }
                             else if(step==waysteparray.length-1){
+                                nextDes = "Destination";
                                 dirtocompass = turndegree(waysteparray[step][2],mAzimuth);
                                 // take the smallest turn
                                 if(dirtocompass <-30 || dirtocompass >30) {
                                     if (dirtocompass < 180) {
                                         // Turn left : left degrees
-                                        pointtext= "Turn Right: " + String.valueOf(dirtocompass);
+                                        lasttext = "Turn Right " + String.valueOf(dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
                                     } else {
                                         // Turn right : 360-left degrees
-                                        pointtext="Turn Left: " + String.valueOf( 360 - dirtocompass);
+                                        lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
                                     }
-                                    pointer.setText(pointtext);
-                                    Act.setText("Turn");
+                                    textfinal.setText(lasttext);
                                 }
                                 else{
-                                    pointtext= "This Direction";
-                                    pointer.setText(pointtext);
-                                    Act.setText("Walk");
+                                    lasttext = "Walk straight for 3 meters to reach " + nextDes;
+                                    textfinal.setText(lasttext);
                                 }
                                 if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1])){
                                     proximityManager.stopScanning();
@@ -304,9 +288,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                         }
                                     });
                                     player.start();
-                                    direction.setText("Done");
-                                    pointer.setText("Done");
-                                    Act.setText("Done");
+                                    textfinal.setText("Done");
                                     endbtn.setVisibility(View.VISIBLE);
                                     endbtn.setOnClickListener(new View.OnClickListener() {
                                         @Override
@@ -416,8 +398,6 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
             where = "E";
         if (mAzimuth <= 80 && mAzimuth > 10)
             where = "NE";
-
-        faceing.setText(mAzimuth + "° " + where);
     }
 
     @Override
