@@ -32,6 +32,8 @@ import com.kontakt.sdk.android.ble.manager.listeners.SecureProfileListener;
 import com.kontakt.sdk.android.common.KontaktSDK;
 import com.kontakt.sdk.android.common.profile.ISecureProfile;
 
+import org.w3c.dom.Text;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +63,8 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     Button endbtn;
     // final text
     TextView textfinal;
+    // Distance text
+    TextView textdistant;
 
     //step counter
     int step = 0;
@@ -132,6 +136,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
         endbtn = (Button)findViewById(R.id.donebtn);
         textfinal = (TextView) findViewById(R.id.final_text);
+        textdistant = (TextView) findViewById(R.id.distant);
 
         // init user location
         getinstruc = getIntent();
@@ -219,6 +224,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                             waysteparray = convertdata(waystep);
                             endbtn = (Button)findViewById(R.id.donebtn);
                             textfinal = (TextView) findViewById(R.id.final_text);
+                            textdistant =(TextView) findViewById(R.id.distant);
 
                             String[] now = waysteparray[step];
                             //variable to calculate faceing
@@ -254,10 +260,12 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                         lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
                                     }
                                     textfinal.setText(lasttext);
+                                    textdistant.setText(Double.toString(min2.getValue()));
                                 }
                                 else{
                                     lasttext = "Walk straight for 3 meters to reach " + nextDes;
                                     textfinal.setText(lasttext);
+                                    textdistant.setText(Double.toString(min2.getValue()));
                                 }
                             }
                             else if(step==waysteparray.length-1){
@@ -273,10 +281,12 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                         lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
                                     }
                                     textfinal.setText(lasttext);
+                                    textdistant.setText(Double.toString(min2.getValue()));
                                 }
                                 else{
                                     lasttext = "Walk straight for 3 meters to reach " + nextDes;
                                     textfinal.setText(lasttext);
+                                    textdistant.setText(Double.toString(min2.getValue()));
                                 }
                                 if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1])){
                                     proximityManager.stopScanning();
@@ -289,6 +299,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     });
                                     player.start();
                                     textfinal.setText("Done");
+                                    textdistant.setText("Done");
                                     endbtn.setVisibility(View.VISIBLE);
                                     endbtn.setOnClickListener(new View.OnClickListener() {
                                         @Override
@@ -304,6 +315,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                                     .getLaunchIntentForPackage( getBaseContext().getPackageName() );
                                             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                             startActivity(i);
+                                            finish();
                                         }
                                     });
                                 }
