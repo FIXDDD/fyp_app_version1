@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProfileDiscovered(ISecureProfile profile) {
                 Log.i("Sample", "IBeacon discovered: " + profile.getUniqueId() + " " + profile.getTxPower() + " " + Double.valueOf(profile.getRssi()) + " " + calculateAccuracy(-75,Double.valueOf(profile.getRssi())));
-                value.put(profile.getUniqueId(),calculateAccuracy(-75,Double.valueOf(profile.getRssi())));
+                value.put(profile.getUniqueId(),calculateAccuracy(-77,Double.valueOf(profile.getRssi())));
                 for(Map.Entry<String,Double> entry: value.entrySet()){
                     if(min == null|| min.getValue() > entry.getValue()){
                         min = entry;

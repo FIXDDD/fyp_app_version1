@@ -195,8 +195,8 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
         return new SecureProfileListener() {
             @Override
             public void onProfileDiscovered(ISecureProfile profile) {
-                Log.i("Sample2", "IBeacon discovered: " + profile.getUniqueId() + " " + profile.getTxPower() + " " + Double.valueOf(profile.getRssi()) + " " + calculateAccuracy(-75,Double.valueOf(profile.getRssi())));
-                value2.put(profile.getUniqueId(),calculateAccuracy(-75,calculateAccuracy(-75,Double.valueOf(profile.getRssi()))));
+                Log.i("Sample2", "IBeacon discovered: " + profile.getUniqueId() + " " + profile.getTxPower() + " " + Double.valueOf(profile.getRssi()) + " " + calculateAccuracy(-77,Double.valueOf(profile.getRssi())));
+                value2.put(profile.getUniqueId(),calculateAccuracy(-77,Double.valueOf(profile.getRssi())));
                 for(Map.Entry<String,Double> entry: value2.entrySet()){
                     if(min2 == null|| min2.getValue() > entry.getValue()){
                         min2 = entry;
@@ -209,8 +209,8 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
             public void onProfilesUpdated(List<ISecureProfile> profiles) {
                 for(ISecureProfile c: profiles) {
                     if (dataa.getbeacon_place().containsKey(c.getUniqueId())) {
-                        Log.i("testupdate", c.getUniqueId() + ", " + dataa.getbeacon_place().get(c.getUniqueId())[0] + ", " + calculateAccuracy(-75, Double.valueOf(c.getRssi())));
-                        value2.put(c.getUniqueId(), calculateAccuracy(-75, calculateAccuracy(-75, Double.valueOf(c.getRssi()))));
+                        Log.i("testupdate", c.getUniqueId() + ", " + dataa.getbeacon_place().get(c.getUniqueId())[0] + ", " + calculateAccuracy(-77, Double.valueOf(c.getRssi())));
+                        value2.put(c.getUniqueId(), calculateAccuracy(-77, Double.valueOf(c.getRssi())));
                         for (Map.Entry<String, Double> entry : value2.entrySet()) {
                             if (min2 == null || min2.getValue() > entry.getValue()) {
                                 min2 = entry;
