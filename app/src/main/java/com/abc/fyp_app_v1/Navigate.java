@@ -101,6 +101,7 @@ public class Navigate extends AppCompatActivity {
             instruction.putExtra("instruc",d);
             instruction.putExtra("OAD",getIntent().getExtras().getBoolean("OAD"));
             startActivity(instruction);
+            finish();
         }
     }
 

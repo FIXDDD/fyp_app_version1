@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -89,6 +91,8 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
     int OADcount=0;
 
+    android.app.AlertDialog alert;
+
     //Bluetooth part
 // Receivers
 
@@ -121,6 +125,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
         setContentView(R.layout.activity_instruction);
 
         this.setTitle("Please follow instruction shown on screen bellow");
+
 
         if(getIntent().getExtras().getBoolean("OAD") == Boolean.TRUE) {
             LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
@@ -178,6 +183,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     protected void onDestroy() {
         proximityManager.disconnect();
         proximityManager = null;
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
         super.onDestroy();
     }
 
@@ -233,7 +239,17 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                             String nextDes="";
                             if (step<waysteparray.length-1) {
                                 nextDes = waysteparray[step][1];
-                                if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step + 1][0])) {
+                                if( ((!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][0])) && (!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step + 1][0]))) && min2.getValue()<=1.0 ){
+                                    proximityManager.stopScanning();
+                                    if(getIntent().getExtras().getBoolean("OAD") == Boolean.TRUE) {
+                                        LocalBroadcastManager.getInstance(InstructionActivity.this).unregisterReceiver(mReceiver);
+                                    }
+                                    final String j = beacon_placenow.get(min2.getKey())[0];
+                                    final String[][] k = waysteparray;
+                                    Log.i("Nearest Beacon",j);
+                                    buildAlertMessageWrongWay(j,k);
+                                }
+                                if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step + 1][0]) && min2.getValue()<= 1.0) {
                                     if(player == null){
                                         player = MediaPlayer.create(getApplication().getApplicationContext() ,R.raw.log );
                                         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -248,7 +264,6 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     step = step + 1;
                                     nextDes = waysteparray[step][1];
                                 }
-
                                 dirtocompass = turndegree(waysteparray[step][2],mAzimuth);
                                 // take the smallest turn
                                 if(dirtocompass <-30 || dirtocompass >30) {
@@ -267,6 +282,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     textfinal.setText(lasttext);
                                     textdistant.setText(Double.toString(min2.getValue()));
                                 }
+
                             }
                             else if(step==waysteparray.length-1){
                                 nextDes = "Destination";
@@ -288,7 +304,16 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     textfinal.setText(lasttext);
                                     textdistant.setText(Double.toString(min2.getValue()));
                                 }
-                                if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1])){
+                                if( ((!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][0])) && (!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1]))) && min2.getValue()<=1.0 ){
+                                    proximityManager.stopScanning();
+                                    if(getIntent().getExtras().getBoolean("OAD") == Boolean.TRUE) {
+                                        LocalBroadcastManager.getInstance(InstructionActivity.this).unregisterReceiver(mReceiver);
+                                    }
+                                    final String j = beacon_placenow.get(min2.getKey())[0];
+                                    final String[][] k = waysteparray;
+                                    buildAlertMessageWrongWay(j,k);
+                                }
+                                if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1]) && min2.getValue()<= 1.0 ){
                                     proximityManager.stopScanning();
                                     player = MediaPlayer.create(getApplication().getApplicationContext() ,R.raw.out );
                                     player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -493,6 +518,25 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
             player.release();
             player = null;
         }
+    }
+
+    // ALTER MESSAGE for WrongWay
+    public void buildAlertMessageWrongWay(final String x, final String[][] y) {
+
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setMessage("You walk toward the wrong direction, we will lead you back to the right path now.")
+                .setCancelable(false)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        Intent instruction = new Intent(InstructionActivity.this,Navigate.class);
+                        instruction.putExtra("STARTEND",x + "," +y[y.length-1][1]);
+                        instruction.putExtra("OAD",getIntent().getExtras().getBoolean("OAD"));
+                        startActivity(instruction);
+                        dialog.dismiss();
+                    }
+                });
+        alert = builder.create();
+        alert.show();
     }
 
 }

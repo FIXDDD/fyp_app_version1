@@ -80,6 +80,7 @@ public class Destination extends AppCompatActivity {
                     navigate_message.putExtra("OAD",getIntent().getExtras().getBoolean("OAD"));
                     //start next activity
                     startActivity(navigate_message);
+                    finish();
                 }
             }
         });

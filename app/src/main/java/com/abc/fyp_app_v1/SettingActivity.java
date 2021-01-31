@@ -2,6 +2,7 @@ package com.abc.fyp_app_v1;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
 import android.app.AlarmManager;
@@ -22,6 +23,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -54,6 +56,8 @@ public class SettingActivity extends AppCompatActivity {
 
     // for loading scan beacon
     ProgressDialog scanProgressDialog;
+    //for verify connection
+    ProgressDialog verifyProgressDialog;
 
     // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver mBroadcastReceiver1 = new BroadcastReceiver() {
@@ -94,6 +98,34 @@ public class SettingActivity extends AppCompatActivity {
                     mBTDevice = device;
                     Log.d("Found device", "Raspberry pi");
                 }
+            }
+        }
+    };
+
+    int OADcount=0;
+    int havamessage = 0;
+
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("Receive", "onReceive: " + intent.getStringExtra("theMessage"));
+            if (intent.getStringExtra("theMessage").equals("1") && OADcount == 0) {
+                Toast.makeText(SettingActivity.this, "Obstacle blocking the way within 1 meter!", Toast.LENGTH_SHORT).show();
+                OADcount = OADcount + 1;
+                havamessage = 2;
+            };
+            if (intent.getStringExtra("theMessage").equals("1") && OADcount > 0 && OADcount <5 ) {
+                OADcount = OADcount + 1;
+                havamessage = 2;
+            };
+            if (intent.getStringExtra("theMessage").equals("1") && OADcount >=5 ) {
+                Toast.makeText(SettingActivity.this, "Obstacle blocking the way within 1 meter!", Toast.LENGTH_SHORT).show();
+                OADcount = 0;
+                havamessage = 2;
+            };
+            if(intent.getStringExtra("theMessage").equals("0")){
+                OADcount = 0;
+                havamessage = 2;
             }
         }
     };
@@ -220,7 +252,7 @@ public class SettingActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void connectrasp(View view){
+    private void connectrasp(final View view){
         mBluetoothAdapter.startDiscovery();
         mBluetoothConnection = new BluetoothConnectionService(SettingActivity.this);
         IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -232,7 +264,7 @@ public class SettingActivity extends AppCompatActivity {
                 mBluetoothAdapter.cancelDiscovery();
                 scanProgressDialog.dismiss();
                 if (mBTDevice != null){
-                    buildAlertMessageConnectDevice();
+                    buildAlertMessageConnectDevice(view);
                 }else{
                     buildAlertMessageNoRasp();
                 }
@@ -243,7 +275,7 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     // ALTER MESSAGE for gps
-    protected void buildAlertMessageConnectDevice() {
+    protected void buildAlertMessageConnectDevice(final View view) {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Object Avoidance device nearby, Would you like to connect to the device?")
@@ -252,9 +284,26 @@ public class SettingActivity extends AppCompatActivity {
                     public void onClick(final DialogInterface dialog, final int id) {
                         Log.i("Connect to raspberry","Connecting to raspberry");
                         mBluetoothConnection.startClient(mBTDevice,MY_UUID_INSECURE);
-                        Intent intent = new Intent(SettingActivity.this,MainActivity.class);
-                        intent.putExtra("OAD",Boolean.TRUE);
-                        startActivity(intent);
+                        LocalBroadcastManager.getInstance(SettingActivity.this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
+                        verifyProgressDialog = ProgressDialog.show(SettingActivity.this,"Checking bluetooth device connection "
+                                ,"Please Wait...",true);
+                        view.postDelayed(new Runnable() {
+                                             public void run() {
+                                                 verifyProgressDialog.dismiss();
+                                                 if(havamessage == 2){
+                                                     LocalBroadcastManager.getInstance(SettingActivity.this).unregisterReceiver(mReceiver);
+                                                     Intent intent = new Intent(SettingActivity.this,MainActivity.class);
+                                                     intent.putExtra("OAD",Boolean.TRUE);
+                                                     startActivity(intent);
+                                                 }
+                                                 else{
+                                                     Log.i("Have error", "ERROR!!!!!!!!!!!!!!!!!!!!");
+                                                     buildAlertMessageFailVerify();
+                                                 }
+                                             }
+                                         }
+                                , 5000);
+
                     }
                 })
                 .setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
@@ -275,15 +324,33 @@ public class SettingActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Scan again", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.dismiss();
                         return;
                     }
                 })
                 .setNegativeButton("Continue without it", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.dismiss();
                         Intent intent = new Intent(SettingActivity.this,MainActivity.class);
                         intent.putExtra("OAD",Boolean.FALSE);
                         startActivity(intent);
 
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    // ALTER MESSAGE for verify fail
+    protected void buildAlertMessageFailVerify() {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Verify of bluetooth connection failed, please try again.")
+                .setCancelable(false)
+                .setPositiveButton("try again", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.dismiss();
+                        return;
                     }
                 });
         final AlertDialog alert = builder.create();
