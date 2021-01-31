@@ -173,13 +173,8 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Try again", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.dismiss();
                         return;
-                    }
-                })
-                .setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        finish();
-                        System.exit(0);
                     }
                 });
         final AlertDialog alert = builder.create();
