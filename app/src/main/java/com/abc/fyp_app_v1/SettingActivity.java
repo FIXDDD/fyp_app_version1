@@ -230,7 +230,7 @@ public class SettingActivity extends AppCompatActivity {
         alert.show();
     }
 
-    // ALTER MESSAGE for gps
+    // ALTER MESSAGE for no bluetooth
     protected void buildAlertMessageNoBT() {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -274,7 +274,7 @@ public class SettingActivity extends AppCompatActivity {
 
     }
 
-    // ALTER MESSAGE for gps
+    // ALTER MESSAGE for connect bluetooth device
     protected void buildAlertMessageConnectDevice(final View view) {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -316,7 +316,7 @@ public class SettingActivity extends AppCompatActivity {
         alert.show();
     }
 
-    // ALTER MESSAGE for gps
+    // ALTER MESSAGE for OAD
     protected void buildAlertMessageNoRasp() {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);

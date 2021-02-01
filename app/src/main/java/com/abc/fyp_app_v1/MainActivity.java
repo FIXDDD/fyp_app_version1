@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ALTER MESSAGE for gps
+    // ALTER MESSAGE for no beacon
     protected void buildAlertMessageNoBeacon() {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);

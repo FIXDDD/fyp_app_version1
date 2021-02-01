@@ -65,8 +65,8 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     Button endbtn;
     // final text
     TextView textfinal;
-    // Distance text
-    TextView textdistant;
+    // Distance text for testing
+    //TextView textdistant;
 
     //step counter
     int step = 0;
@@ -141,7 +141,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
         endbtn = (Button)findViewById(R.id.donebtn);
         textfinal = (TextView) findViewById(R.id.final_text);
-        textdistant = (TextView) findViewById(R.id.distant);
+        //textdistant = (TextView) findViewById(R.id.distant);
 
         // init user location
         getinstruc = getIntent();
@@ -230,7 +230,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                             waysteparray = convertdata(waystep);
                             endbtn = (Button)findViewById(R.id.donebtn);
                             textfinal = (TextView) findViewById(R.id.final_text);
-                            textdistant =(TextView) findViewById(R.id.distant);
+                            //textdistant =(TextView) findViewById(R.id.distant);
 
                             String[] now = waysteparray[step];
                             //variable to calculate faceing
@@ -275,12 +275,12 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                         lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
                                     }
                                     textfinal.setText(lasttext);
-                                    textdistant.setText(Double.toString(min2.getValue()));
+                                    //textdistant.setText(Double.toString(min2.getValue()));
                                 }
                                 else{
                                     lasttext = "Walk straight for 3 meters to reach " + nextDes;
                                     textfinal.setText(lasttext);
-                                    textdistant.setText(Double.toString(min2.getValue()));
+                                    //textdistant.setText(Double.toString(min2.getValue()));
                                 }
 
                             }
@@ -297,12 +297,12 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                         lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
                                     }
                                     textfinal.setText(lasttext);
-                                    textdistant.setText(Double.toString(min2.getValue()));
+                                    //textdistant.setText(Double.toString(min2.getValue()));
                                 }
                                 else{
                                     lasttext = "Walk straight for 3 meters to reach " + nextDes;
                                     textfinal.setText(lasttext);
-                                    textdistant.setText(Double.toString(min2.getValue()));
+                                    //textdistant.setText(Double.toString(min2.getValue()));
                                 }
                                 if( ((!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][0])) && (!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1]))) && min2.getValue()<=1.0 ){
                                     proximityManager.stopScanning();
@@ -324,7 +324,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     });
                                     player.start();
                                     textfinal.setText("Done");
-                                    textdistant.setText("Done");
+                                    //textdistant.setText("Done");
                                     endbtn.setVisibility(View.VISIBLE);
                                     endbtn.setOnClickListener(new View.OnClickListener() {
                                         @Override
