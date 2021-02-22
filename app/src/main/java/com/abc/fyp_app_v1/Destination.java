@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -24,16 +25,22 @@ import java.util.List;
 public class Destination extends AppCompatActivity {
 
     // call dataHolder class
-    DataHolder2 data = new DataHolder2();
+    //DataHolder2 data = new DataHolder2();
 
     //The list of room in the area
     //String[] roomArray = {"r1","r2","r3","r4","r5","r6"};
-    String[] roomArray = data.getroomArray();
-    List<String> list = new ArrayList<String>(Arrays.asList(roomArray));
+    //String[] roomArray = data.getroomArray();
+    //List<String> list = new ArrayList<String>(Arrays.asList(roomArray));
 
     // static HashMap to store which beacon is which area
-    public HashMap<String, String[]> beacon_place= data.getbeacon_place();
+    //public HashMap<String, String[]> beacon_place= data.getbeacon_place();
 
+    //init database
+    DatabaseHelper myDB;
+
+    //array and list to store db data
+    String[] roomArray;
+    List<String> list;
 
     //view variable
     ListView roomlist;
@@ -50,11 +57,19 @@ public class Destination extends AppCompatActivity {
 
         this.setTitle("Please select your destination bellow");
 
+        //setup database
+        myDB = new DatabaseHelper(this);
+
+        //setup array and list to store db data
+        roomArray = roomslist(myDB);
+        list = new ArrayList<String>(Arrays.asList(roomArray));
+
         //set intent
         navigate_message = new Intent(Destination.this,Navigate.class);
         main_message = getIntent();
 
-        final String x = beacon_place.get(main_message.getExtras().getString("NEAR_BEACON"))[0];
+        //final String x = beacon_place.get(main_message.getExtras().getString("NEAR_BEACON"))[0];
+        final String x = myDB.findLocation(main_message.getExtras().getString("NEAR_BEACON"));
         Log.i("xvalue",x);
         list.remove(x);
 
@@ -87,6 +102,23 @@ public class Destination extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.room_list);
         listView.setAdapter(adapter);
+    }
+
+    // Get list of Locations in database and remove all c beacons
+    public String[] roomslist(DatabaseHelper myDB){
+        Cursor data = myDB.showRooms();
+        List<String> list = new ArrayList<String>();
+        while(data.moveToNext()){
+            list.add(data.getString(0));
+        }
+        for (int i = 0; i < list.size(); i++) {
+            if(list.get(i).charAt(0) == 'c'){
+                list.remove(list.get(i));
+            }
+        }
+        String[] result= new String[list.size()];
+        Log.i("test",Arrays.toString(list.toArray(result)));
+        return list.toArray(result);
     }
 
 

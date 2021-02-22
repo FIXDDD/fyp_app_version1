@@ -306,10 +306,12 @@ public class SettingActivity extends AppCompatActivity {
 
                     }
                 })
-                .setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+                .setNegativeButton("No,continue without it.", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
-                        finish();
-                        System.exit(0);
+                        dialog.dismiss();
+                        Intent intent = new Intent(SettingActivity.this,MainActivity.class);
+                        intent.putExtra("OAD",Boolean.FALSE);
+                        startActivity(intent);
                     }
                 });
         final AlertDialog alert = builder.create();
