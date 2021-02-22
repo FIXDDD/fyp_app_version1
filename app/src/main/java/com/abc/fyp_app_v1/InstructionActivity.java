@@ -492,16 +492,16 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
          int tur = 0;
 
 
-        if(face.equals("U")){
+        if(face.equals("N")){
             dir = 360;
         }
-        if(face.equals("D")){
+        if(face.equals("S")){
             dir = 180;
         }
-        if(face.equals("R")){
+        if(face.equals("E")){
             dir = 90;
         }
-        if(face.equals("L")){
+        if(face.equals("W")){
             dir= 270;
         }
 
