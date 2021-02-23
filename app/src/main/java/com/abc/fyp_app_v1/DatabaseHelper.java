@@ -164,4 +164,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         data.moveToNext();
         return data.getString(0);
     }
+
+    public boolean containsBeacon(String beacon) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor data = db.rawQuery("SELECT COUNT(1) FROM " + TABLE_NAME1 + " WHERE " + T1_col2 + " = " + "\"" + beacon + "\"", null);
+        data.moveToNext();
+        if (data.getInt(0) > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public int distanceBetweenBeacon(String x,String y){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor data = db.rawQuery("SELECT "+ T2_col3 + " FROM " + TABLE_NAME2 + " WHERE " + T2_col1 + " = " + "\"" + x + "\" and "+ T2_col2 + " = "+ "\"" + y + "\"", null);
+        data.moveToNext();
+        return data.getInt(0);
+    }
 }

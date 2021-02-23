@@ -49,7 +49,13 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     private ProximityManager proximityManager;
 
     //Dataholder
-    DataHolder2 dataa = new DataHolder2();
+    //DataHolder2 dataa = new DataHolder2();
+
+    //init database
+    DatabaseHelper myDB;
+
+    //int the variable to get distance from db
+    int Beacon_dis;
 
     //Map to store detected beacon
     public Map<String,Double> value2 =new HashMap<String,Double>();
@@ -70,7 +76,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
 
     //step counter
     int step = 0;
-    HashMap<String, String[]> beacon_placenow = dataa.getbeacon_place();
+    //HashMap<String, String[]> beacon_placenow = dataa.getbeacon_place();
 
     // facing variable
     int mAzimuth;
@@ -130,6 +136,9 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
         if(getIntent().getExtras().getBoolean("OAD") == Boolean.TRUE) {
             LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
         }
+
+        //init database
+        myDB = new DatabaseHelper(this);
 
         //initialize Kontakt
         KontaktSDK.initialize("DkDxdmEmVCGZDobylzFHLzNiudPrNfOX");
@@ -214,8 +223,10 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
             @Override
             public void onProfilesUpdated(List<ISecureProfile> profiles) {
                 for(ISecureProfile c: profiles) {
-                    if (dataa.getbeacon_place().containsKey(c.getUniqueId())) {
-                        Log.i("testupdate", c.getUniqueId() + ", " + dataa.getbeacon_place().get(c.getUniqueId())[0] + ", " + calculateAccuracy(-77, Double.valueOf(c.getRssi())));
+                    //if (dataa.getbeacon_place().containsKey(c.getUniqueId()))
+                    if(myDB.containsBeacon(c.getUniqueId())){
+                        //Log.i("testupdate", c.getUniqueId() + ", " + dataa.getbeacon_place().get(c.getUniqueId())[0] + ", " + calculateAccuracy(-77, Double.valueOf(c.getRssi())));
+                        Log.i("testupdate", c.getUniqueId() + ", " + myDB.findLocation(c.getUniqueId()) + ", " + calculateAccuracy(-77, Double.valueOf(c.getRssi())));
                         value2.put(c.getUniqueId(), calculateAccuracy(-77, Double.valueOf(c.getRssi())));
                         for (Map.Entry<String, Double> entry : value2.entrySet()) {
                             if (min2 == null || min2.getValue() > entry.getValue()) {
@@ -239,17 +250,17 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                             String nextDes="";
                             if (step<waysteparray.length-1) {
                                 nextDes = waysteparray[step][1];
-                                if( ((!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][0])) && (!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step + 1][0]))) && min2.getValue()<=1.0 ){
+                                if( ((!myDB.findLocation(min2.getKey()).equals(waysteparray[step][0])) && (!myDB.findLocation(min2.getKey()).equals(waysteparray[step + 1][0]))) && min2.getValue()<=1.0 ){
                                     proximityManager.stopScanning();
                                     if(getIntent().getExtras().getBoolean("OAD") == Boolean.TRUE) {
                                         LocalBroadcastManager.getInstance(InstructionActivity.this).unregisterReceiver(mReceiver);
                                     }
-                                    final String j = beacon_placenow.get(min2.getKey())[0];
+                                    final String j = myDB.findLocation(min2.getKey());
                                     final String[][] k = waysteparray;
                                     Log.i("Nearest Beacon",j);
                                     buildAlertMessageWrongWay(j,k);
                                 }
-                                if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step + 1][0]) && min2.getValue()<= 1.0) {
+                                if (myDB.findLocation(min2.getKey()).equals(waysteparray[step + 1][0]) && min2.getValue()<= 1.0) {
                                     if(player == null){
                                         player = MediaPlayer.create(getApplication().getApplicationContext() ,R.raw.log );
                                         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -265,20 +276,24 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                                     nextDes = waysteparray[step][1];
                                 }
                                 dirtocompass = turndegree(waysteparray[step][2],mAzimuth);
+
+                                //get distance from db
+                                Beacon_dis = myDB.distanceBetweenBeacon(waysteparray[step][0],waysteparray[step][1]);
+
                                 // take the smallest turn
                                 if(dirtocompass <-30 || dirtocompass >30) {
                                     if (dirtocompass < 180) {
                                         // Turn left : left degrees
-                                        lasttext = "Turn Right " + String.valueOf(dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
+                                        lasttext = "Turn Right " + String.valueOf(dirtocompass) + " degrees and walk straight for "+ toString().valueOf(Beacon_dis) +" meters to reach " + nextDes;
                                     } else {
                                         // Turn right : 360-left degrees
-                                        lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
+                                        lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for "+ toString().valueOf(Beacon_dis) +" meters to reach " + nextDes;
                                     }
                                     textfinal.setText(lasttext);
                                     //textdistant.setText(Double.toString(min2.getValue()));
                                 }
                                 else{
-                                    lasttext = "Walk straight for 3 meters to reach " + nextDes;
+                                    lasttext = "Walk straight for "+ toString().valueOf(Beacon_dis) +" meters to reach " + nextDes;
                                     textfinal.setText(lasttext);
                                     //textdistant.setText(Double.toString(min2.getValue()));
                                 }
@@ -287,33 +302,37 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
                             else if(step==waysteparray.length-1){
                                 nextDes = "Destination";
                                 dirtocompass = turndegree(waysteparray[step][2],mAzimuth);
+
+                                //get distance from db
+                                Beacon_dis = myDB.distanceBetweenBeacon(waysteparray[step][0],waysteparray[step][1]);
+
                                 // take the smallest turn
                                 if(dirtocompass <-30 || dirtocompass >30) {
                                     if (dirtocompass < 180) {
                                         // Turn left : left degrees
-                                        lasttext = "Turn Right " + String.valueOf(dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
+                                        lasttext = "Turn Right " + String.valueOf(dirtocompass) + " degrees and walk straight for "+ toString().valueOf(Beacon_dis) +" meters to reach " + nextDes;
                                     } else {
                                         // Turn right : 360-left degrees
-                                        lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for 3 meters to reach " + nextDes;
+                                        lasttext = "Turn Left " + String.valueOf(360 - dirtocompass) + " degrees and walk straight for "+ toString().valueOf(Beacon_dis) +" meters to reach " + nextDes;
                                     }
                                     textfinal.setText(lasttext);
                                     //textdistant.setText(Double.toString(min2.getValue()));
                                 }
                                 else{
-                                    lasttext = "Walk straight for 3 meters to reach " + nextDes;
+                                    lasttext = "Walk straight for "+ toString().valueOf(Beacon_dis) +" meters to reach " + nextDes;
                                     textfinal.setText(lasttext);
                                     //textdistant.setText(Double.toString(min2.getValue()));
                                 }
-                                if( ((!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][0])) && (!beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1]))) && min2.getValue()<=1.0 ){
+                                if( ((!myDB.findLocation(min2.getKey()).equals(waysteparray[step][0])) && (!myDB.findLocation(min2.getKey()).equals(waysteparray[step][1]))) && min2.getValue()<=1.0 ){
                                     proximityManager.stopScanning();
                                     if(getIntent().getExtras().getBoolean("OAD") == Boolean.TRUE) {
                                         LocalBroadcastManager.getInstance(InstructionActivity.this).unregisterReceiver(mReceiver);
                                     }
-                                    final String j = beacon_placenow.get(min2.getKey())[0];
+                                    final String j = myDB.findLocation(min2.getKey());
                                     final String[][] k = waysteparray;
                                     buildAlertMessageWrongWay(j,k);
                                 }
-                                if (beacon_placenow.get(min2.getKey())[0].equals(waysteparray[step][1]) && min2.getValue()<= 1.0 ){
+                                if (myDB.findLocation(min2.getKey()).equals(waysteparray[step][1]) && min2.getValue()<= 1.0 ){
                                     proximityManager.stopScanning();
                                     player = MediaPlayer.create(getApplication().getApplicationContext() ,R.raw.out );
                                     player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
