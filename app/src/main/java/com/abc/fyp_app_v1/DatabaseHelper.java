@@ -16,13 +16,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String T1_col1 = "LOCATIONS";
     public static final String T1_col2 = "BEACONS";
     public static final String TABLE_NAME2 = "Beacon_distance";
-    public static final String T2_col1 = "STARTBEACON";
-    public static final String T2_col2 = "ENDBEACON";
+    public static final String T2_col1 = "STARTLOCATION";
+    public static final String T2_col2 = "ENDLOCATION";
     public static final String T2_col3 = "DISTANCE";
     public static final String createTable1 = "CREATE TABLE " + TABLE_NAME1 + "(LOCATIONS TEXT,BEACONS TEXT," +
-            "primary key (LOCATIONS));";
-    public static final String createTable2 = "CREATE TABLE " + TABLE_NAME2 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT," +
-            " STARTBEACON TEXT,ENDBEACON TEXT,DISTANCE INT, FOREIGN KEY(STARTBEACON) REFERENCES "+TABLE_NAME1+"(LOCATIONS));";
+            "primary key (LOCATIONS,BEACONS));";
+    public static final String createTable2 = "CREATE TABLE " + TABLE_NAME2 + "(PATH_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+            " STARTLOCATION TEXT,ENDLOCATION TEXT,DISTANCE INT, FOREIGN KEY(STARTLOCATION) REFERENCES "+TABLE_NAME1+"(LOCATIONS));";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
