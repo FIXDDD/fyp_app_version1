@@ -543,7 +543,7 @@ public class InstructionActivity extends AppCompatActivity implements SensorEven
     public void buildAlertMessageWrongWay(final String x, final String[][] y) {
 
         final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setMessage("You walk toward the wrong direction, we will lead you back to the right path now.")
+        builder.setMessage("An Error detected, The application will re-compute the path now.")
                 .setCancelable(false)
                 .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
